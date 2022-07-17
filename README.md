@@ -1,0 +1,5 @@
+# set_gaming_mode
+![Screenshot](https://github.com/plasticbit/gaming_mode_setter/blob/master/img/screen.png)  
+just writing  
+no testing  
+This application can only use LG Gaming Monitor UltraGear [27GL850-B](https://www.lg.com/jp/monitor/lg-27GL850-B).
