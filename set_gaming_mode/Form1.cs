@@ -6,28 +6,28 @@ namespace set_gaming_mode
 {
     public partial class Form1 : Form
     {
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern IntPtr GetMonitor(IntPtr hwnd);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern ulong GetNumMonitors(IntPtr hmonitor);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern IntPtr AllocMonitorStruct(IntPtr hmonitor, ulong size);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern bool GetPhysicalMonitor(IntPtr hmonitor, ulong size, IntPtr lppms);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern IntPtr GetDescriptionFromStruct(IntPtr lppms, int idx);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern bool SetVCPFeatureToMonitor(IntPtr lppms, byte key, ulong value);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern bool GetVCPFeatureCurrentValueFromMonitor(IntPtr lppms, int idx, byte code, out ulong currentValue);
 
-        [DllImport(@"..\..\..\..\x64\Debug\ddcci_lib.dll")]
+        [DllImport(@"..\..\..\..\x64\Release\ddcci_lib.dll")]
         private static extern bool DestroyMonitorStruct(ulong size, IntPtr lppms);
 
 
@@ -43,6 +43,7 @@ namespace set_gaming_mode
 
         private void Form1_Load(object? sender, EventArgs e)
         {
+            // Get HMONITOR from HANDLE
             Monitor = GetMonitor(Handle);
             if (Monitor == IntPtr.Zero) ShowErrorExit("Could not get the monitor.");
 
@@ -52,41 +53,70 @@ namespace set_gaming_mode
             LPPMS = AllocMonitorStruct(Monitor, size);
             if (LPPMS == IntPtr.Zero) ShowErrorExit("Failed to allocate memory");
 
+            // Get the PhysicalMonitor to MonitorStruct
             if (!GetPhysicalMonitor(Monitor, size, LPPMS)) ShowErrorExit("Could not get monitor information.");
 
-            var description = Marshal.PtrToStringUni(GetDescriptionFromStruct(LPPMS, 0));
-            label1.Text = (description == null ? "不明なモニター" : description.ToString());
-
-            button3.Click += (o, e) => 
+            // Form1 Events Shown, button2/3 Clicked, FormClosed
+            Shown += (o, e) =>
             {
-                if (!GetVCPFeatureCurrentValueFromMonitor(LPPMS, 0, 0x15, out ulong cval))
-                {
-                    MessageBox.Show("Failed to get the current value.");
-                    return;
-                }
+                // Add a monitor name on screen upper left
+                var description = Marshal.PtrToStringUni(GetDescriptionFromStruct(LPPMS, 0));
+                label1.Text = (description == null ? "不明なモニター" : description.ToString());
 
-                var rb = ModeValueToRadioButton(cval);
-                if (rb == null)
+                var get_current_mode = () =>
                 {
-                    MessageBox.Show("Unknown value returned.");
-                    return;
-                }
+                    if (!GetVCPFeatureCurrentValueFromMonitor(LPPMS, 0, 0x15, out ulong mode))
+                    {
+                        MessageBox.Show("Failed to get the current value.");
+                        return 0ul;
+                    }
 
-                rb.Focus();
+                    return mode;
+                };
+
+                // Set default mode when run this application.
+                var current_mode = get_current_mode();
+                if (current_mode != 0)
+                {
+                    if (current_mode != 0x1) radioButton6.Focus();
+                    else radioButton1.Focus();
+                };
+
+                // When clicked, get active gaming mode then forcus that mode radio button.
+                button3.Click += (o, e) =>
+                {
+                    current_mode = get_current_mode();
+                    if (current_mode == 0)
+                    {
+                        MessageBox.Show("Could not get Gaming mode.");
+                        return;
+                    }
+
+                    var rb = ModeValueToRadioButton(current_mode);
+                    if (rb == null)
+                    {
+                        MessageBox.Show("Unknown value returned.");
+                        return;
+                    }
+
+                    rb.Focus();
+                };
+
+                // Apply the selected mode.
+                button2.Click += (o, e) =>
+                {
+                    var checkedButton = groupBox1.Controls.OfType<RadioButton>().SingleOrDefault(rb => rb.Checked);
+                    if (checkedButton == null) return;
+
+                    ulong? mode = RadioButtonToModeValue(checkedButton);
+                    if (mode == null) return;
+
+                    if (!SetVCPFeatureToMonitor(LPPMS, 0x15, (ulong)mode)) MessageBox.Show("Failed to set.", "Error");
+                    Close();
+                };
             };
 
-            button2.Click += (o, e) =>
-            {
-                var checkedButton = groupBox1.Controls.OfType<RadioButton>().SingleOrDefault(rb => rb.Checked);
-                if (checkedButton == null) return;
-
-                ulong? mode = RadioButtonToModeValue(checkedButton);
-                if (mode == null) return;
-
-                if (!SetVCPFeatureToMonitor(LPPMS, 0x15, (ulong)mode)) MessageBox.Show("Failed to set.", "Error");
-                Close();
-            };
-
+            // Release memory
             FormClosed += (o, e) =>
             {
                 if (LPPMS != IntPtr.Zero) DestroyMonitorStruct(size, LPPMS);
