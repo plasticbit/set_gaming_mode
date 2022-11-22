@@ -67,7 +67,7 @@ namespace set_gaming_mode
                 {
                     if (!GetVCPFeatureCurrentValueFromMonitor(LPPMS, 0, 0x15, out ulong mode))
                     {
-                        MessageBox.Show("Failed to get the current value.");
+                        ShowErrorExit("Failed to get the current value.");
                         return 0ul;
                     }
 
