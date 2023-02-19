@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button3 = new System.Windows.Forms.Button();
             this.radioButton8 = new System.Windows.Forms.RadioButton();
@@ -50,6 +51,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.CausesValidation = false;
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.radioButton8);
             this.groupBox1.Controls.Add(this.radioButton7);
@@ -129,6 +131,7 @@
             // 
             this.radioButton6.Appearance = System.Windows.Forms.Appearance.Button;
             this.radioButton6.BackColor = System.Drawing.Color.Black;
+            this.radioButton6.CausesValidation = false;
             this.radioButton6.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.radioButton6.Cursor = System.Windows.Forms.Cursors.Hand;
             this.radioButton6.FlatAppearance.BorderSize = 2;
@@ -248,6 +251,7 @@
             // button2
             // 
             this.button2.BackColor = System.Drawing.Color.Black;
+            this.button2.CausesValidation = false;
             this.button2.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("源ノ角ゴシック Code JP R", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -300,6 +304,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.CausesValidation = false;
             this.label1.Font = new System.Drawing.Font("源ノ角ゴシック Code JP R", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.Color.BlanchedAlmond;
             this.label1.Location = new System.Drawing.Point(12, 9);
@@ -312,12 +317,15 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
+            this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(384, 561);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Set Gaming Mode";
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);

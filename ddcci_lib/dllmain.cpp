@@ -39,10 +39,7 @@ const BOOL __stdcall SetVCPFeatureToMonitor(LPPHYSICAL_MONITOR lppms, BYTE key, 
 }
 
 const BOOL __stdcall GetVCPFeatureCurrentValueFromMonitor(LPPHYSICAL_MONITOR lppms, const int idx, BYTE code, DWORD* currentValue) {
-    MC_VCP_CODE_TYPE  vcpCodeType;
-    DWORD cv, maximumValue;
-
-    return GetVCPFeatureAndVCPFeatureReply(lppms[idx].hPhysicalMonitor, code, &vcpCodeType, currentValue, &maximumValue);
+    return GetVCPFeatureAndVCPFeatureReply(lppms[idx].hPhysicalMonitor, code, NULL, currentValue, NULL);
 }
 
 const BOOL __stdcall DestroyMonitorStruct(DWORD size, LPPHYSICAL_MONITOR lppms) {
